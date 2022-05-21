@@ -1,0 +1,38 @@
+---
+- hosts: all
+  strategy: free
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Download the jenkins repo apt url
+      apt_key: 
+        url: "{{jenkins.repo.url}}"
+        state: present
+      become: yes
+    
+    - name: Ensure the repo is configured 
+      apt_repository: repo='deb https://pkg.jenkins.io/debian-stable binary/' state=present
+      become=yes
+    
+    - name: Update apt Cache
+      apt: 
+        update_cache: yes
+        state: present
+
+    - name: Install JAVA
+      apt:
+        name: {{java}}
+        state: present
+      
+    - name: Install jenkins
+      apt: 
+        name: jenkins
+        state: latest
+
+    - name: Start jenkins
+      service:
+        name: jenkins
+        enabled: true
+        state: started
+
+        
